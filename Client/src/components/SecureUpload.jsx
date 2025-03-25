@@ -7,63 +7,76 @@ const SecureUpload = () => {
     const [img, setImg] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const uploadFile = async (type, timestamp, signature) => {
+    const uploadFile = async (file, type, timestamp, signature) => {
+        if (!file) return null; // Prevent unnecessary uploads
+
+        const folder = type === "image" ? "images" : "videos";
+
         const data = new FormData();
-        data.append('file', type === 'image' ? img : video);
-        data.append('timestamp', timestamp);
-        data.append('signature', signature);
+        data.append("file", file);
+        data.append("timestamp", timestamp);
+        data.append("signature", signature);
         data.append("api_key", import.meta.env.VITE_REACT_APP_CLOUDINARY_API_KEY);
+        data.append("folder", folder);
 
         try {
-            let cloudName = import.meta.env.VITE_REACT_APP_CLOUD_NAME;
-            let resourceType = type === 'image' ? 'image' : 'video';
-            let apiUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
-            let res = await axios.post(apiUrl, data);
-            const { secure_url } = res.data;
-            console.log(secure_url);
-            return secure_url;
+            const cloudName = import.meta.env.VITE_REACT_APP_CLOUD_NAME;
+            const resourceType = type === "image" ? "image" : "video";
+            const apiUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+
+            const res = await axios.post(apiUrl, data);
+            // console.log(`${type} Upload Success:`, res.data);
+            return res.data.secure_url;
         } catch (error) {
-            console.log(error);
+            console.error(`${type} Upload Error:`, error.response?.data || error.message);
             return null;
         }
     };
 
     const getSignatureForUpload = async (folder) => {
         try {
-            const res = await axios.post(`${import.meta.env.VITE_REACT_BACKEND_APP_API_URL}/api/signature-upload`, { folder });
+            const res = await axios.post(
+                `${import.meta.env.VITE_REACT_BACKEND_APP_API_URL}/api/signature-upload`,
+                { folder }
+            );
             return res.data;
         } catch (error) {
-            console.log(error);
-
+            console.error("Signature Fetch Error:", error.response?.data || error.message);
+            return null;
         }
-    }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Show loader
+        if (!img && !video) {
+            alert("Please select a file to upload.");
+            return;
+        }
 
-        const { timestamp: imgTimestamp, signature: imgSignature } = await getSignatureForUpload('image');
-        const { timestamp: videoTimestamp, signature: videoSignature } = await getSignatureForUpload('video');
-
+        setLoading(true);
 
         try {
-            // Upload image file
-            const imgUrl = await uploadFile('image', imgTimestamp, imgSignature);
-            // Upload video file
-            const videoUrl = await uploadFile('video', videoTimestamp, videoSignature);
+            // Generate signatures
+            const imgSignatureData = img ? await getSignatureForUpload("images") : null;
+            const videoSignatureData = video ? await getSignatureForUpload("videos") : null;
 
-            // Send data to backend API
-            // await axios.post(`${import.meta.env.VITE_REACT_BACKEND_APP_API_URL}/api/upload`, { imgUrl, videoUrl });
+            // Upload files
+            const imgUrl = imgSignatureData ? await uploadFile(img, "image", imgSignatureData.timestamp, imgSignatureData.signature) : null;
+            const videoUrl = videoSignatureData ? await uploadFile(video, "video", videoSignatureData.timestamp, videoSignatureData.signature) : null;
 
-            // Reset state
-            setVideo(null);
+            // Send data to backend
+            await axios.post(`${import.meta.env.VITE_REACT_BACKEND_APP_API_URL}/api/upload`, { imgUrl, videoUrl });
+
+            // Reset states
             setImg(null);
-            alert('Upload successful!');
+            setVideo(null);
+            alert("Upload successful!");
         } catch (error) {
-            console.log(error);
-            alert('Upload failed!');
+            console.error("Upload Failed:", error);
+            alert("Upload failed!");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false); // Hide loader
     };
 
     return (
@@ -96,15 +109,9 @@ const SecureUpload = () => {
                     {loading ? "Uploading..." : "Upload"}
                 </button>
 
-                {/* Show Loader when Uploading */}
                 {loading && (
                     <div style={{ marginTop: "10px" }}>
-                        <Circles
-                            height="50"
-                            width="50"
-                            color="#4fa94d"
-                            ariaLabel="loading"
-                        />
+                        <Circles height="50" width="50" color="#4fa94d" ariaLabel="loading" />
                     </div>
                 )}
             </form>
@@ -113,4 +120,3 @@ const SecureUpload = () => {
 };
 
 export default SecureUpload;
-

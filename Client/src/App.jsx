@@ -4,6 +4,7 @@ import About from "./components/About";
 import Home from "./components/Home";
 import Upload from "./components/Upload";
 import SecureUpload from "./components/SecureUpload";
+import AuthPage from "./pages/AuthPage";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/secure-upload" element={<SecureUpload />} />

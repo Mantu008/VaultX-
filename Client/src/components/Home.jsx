@@ -10,7 +10,8 @@ const Home = () => {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const fileInputRef = useRef(null); // 🔹 Fix for file input reset
+    const [userRole, setUserRole] = useState(null); // Store user role
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         checkAuthentication();
@@ -24,13 +25,16 @@ const Home = () => {
                 const decodedToken = jwtDecode(token);
                 if (decodedToken.exp * 1000 > Date.now()) {
                     setIsAuthenticated(true);
+                    setUserRole(decodedToken.role); // Store role
                 } else {
                     localStorage.removeItem("token");
                     setIsAuthenticated(false);
+                    setUserRole(null);
                 }
             } catch (error) {
                 console.error("Invalid token:", error);
                 setIsAuthenticated(false);
+                setUserRole(null);
             }
         }
     };
@@ -104,7 +108,6 @@ const Home = () => {
             fetchMedia();
             alert("Upload successful!");
 
-            // 🔹 Reset inputs properly
             setCategory("");
             setFile(null);
             if (fileInputRef.current) {
@@ -120,29 +123,28 @@ const Home = () => {
 
     const handleDownload = async (url) => {
         try {
-            const response = await axios.get(url, { responseType: "blob" }); // Fetch as Blob
+            const response = await axios.get(url, { responseType: "blob" });
             const blob = new Blob([response.data]);
             const link = document.createElement("a");
 
             link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", url.split("/").pop()); // Extract file name from URL
+            link.setAttribute("download", url.split("/").pop());
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            URL.revokeObjectURL(link.href); // Clean up memory
+            URL.revokeObjectURL(link.href);
         } catch (error) {
             console.error("Download failed:", error);
             alert("Failed to download file.");
         }
     };
 
-
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold">Gallery</h1>
 
-            {/* Show Upload Section only if User is Logged In */}
-            {isAuthenticated && (
+            {/* Show Upload Section only if User is Admin */}
+            {isAuthenticated && userRole === "admin" && (
                 <div className="mt-4 flex flex-col sm:flex-row items-center gap-4">
                     <select onChange={(e) => setCategory(e.target.value)} className="border p-2">
                         <option value="">Select Category</option>

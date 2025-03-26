@@ -6,14 +6,14 @@ const AuthPage = () => {
     const [isRegister, setIsRegister] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [name, setName] = useState(""); // Only for Register
+    const [userName, setUserName] = useState(""); // Only for Register
     const navigate = useNavigate();
 
     const handleAuth = async () => {
         // http://localhost:5000/api/auth/
         try {
             const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
-            const payload = isRegister ? { name, email, password } : { email, password };
+            const payload = isRegister ? { username: userName, email, password } : { email, password };
 
 
             const res = await API.post(endpoint, payload);
@@ -37,9 +37,9 @@ const AuthPage = () => {
                 {isRegister && (
                     <input
                         type="text"
-                        placeholder="Full Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        placeholder="User Name"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
                         className="border p-2 w-full mb-2"
                     />
                 )}

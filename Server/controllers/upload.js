@@ -2,23 +2,40 @@ import Upload from "../models/Upload.js";
 
 export const uploadVideos = async (req, res, next) => {
     try {
-        const { imgUrl, videoUrl } = req.body;
-        // console.log(imgUrl, videoUrl);
-        if (!imgUrl || !videoUrl) {
+        const { imgUrl, videoUrl, category } = req.body;
+
+        // Validate required fields
+        if (!imgUrl && !videoUrl) {
             return res
                 .status(400)
-                .json({ message: "Please provide all fields" });
-            return next(new Error("imageUrl and videoUrl are required"));
+                .json({ message: "Either an image or a video is required" });
         }
+
+        if (!category) {
+            return res.status(400).json({ message: "Category is required" });
+        }
+
+        // Create a new upload document
         const newUpload = new Upload({
             imgUrl,
             videoUrl,
+            category,
         });
+
         const savedUpload = await newUpload.save();
-        res.json(savedUpload);
+        res.status(201).json(savedUpload);
     } catch (error) {
         console.log(error);
-        res.status(500);
-        next(error);
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+
+export const getImagesVideos = async (req, res, next) => {
+    try {
+        const uploads = await Upload.find(); // Fetch all documents
+        res.status(200).json(uploads);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
 };

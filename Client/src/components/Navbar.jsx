@@ -25,50 +25,53 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-gray-800 p-4 text-white shadow-md">
-            <div className="container mx-auto flex justify-between items-center">
-                <h1 className="text-xl font-bold">VaultX</h1>
+        <nav className="bg-gray-900 p-4 shadow-lg">
+            <div className="container mx-auto flex flex-wrap items-center justify-between">
+                {/* Logo */}
+                <Link to="/" className="text-2xl font-bold text-white hover:text-gray-300 transition">
+                    VaultX
+                </Link>
 
-                {/* Show links only if logged in */}
-                {token ? (
-                    <div className="flex items-center space-x-6">
-                        <ul className="flex space-x-6">
-                            <li>
-                                <Link to="/" className="hover:text-gray-300 transition">Home</Link>
-                            </li>
-                            <li>
-                                <Link to="/about" className="hover:text-gray-300 transition">About</Link>
-                            </li>
+                {/* Navigation Links */}
+                <div className="flex items-center gap-6">
+                    <ul className="hidden md:flex items-center gap-6 text-white">
+                        <li>
+                            <Link to="/" className="hover:text-gray-300 transition">Home</Link>
+                        </li>
+                        <li>
+                            <Link to="/about" className="hover:text-gray-300 transition">About</Link>
+                        </li>
 
-                            {/* Show Upload and Secure Upload only for Admin */}
-                            {userRole === "admin" && (
-                                <>
-                                    <li>
-                                        <Link to="/upload" className="hover:text-gray-300 transition">Upload</Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/secure-upload" className="hover:text-gray-300 transition">Secure Upload</Link>
-                                    </li>
-                                </>
-                            )}
-                        </ul>
+                        {/* Show Upload and Secure Upload only for Admin */}
+                        {userRole === "admin" && (
+                            <>
+                                <li>
+                                    <Link to="/upload" className="hover:text-gray-300 transition">Upload</Link>
+                                </li>
+                                <li>
+                                    <Link to="/secure-upload" className="hover:text-gray-300 transition">Secure Upload</Link>
+                                </li>
+                            </>
+                        )}
+                    </ul>
 
-                        {/* Logout Button */}
+                    {/* Authentication Buttons */}
+                    {token ? (
                         <button
                             onClick={handleLogout}
-                            className="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition"
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
                         >
                             Logout
                         </button>
-                    </div>
-                ) : (
-                    <button
-                        onClick={() => navigate("/auth")}
-                        className="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition"
-                    >
-                        Login
-                    </button>
-                )}
+                    ) : (
+                        <button
+                            onClick={() => navigate("/auth")}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+                        >
+                            Login
+                        </button>
+                    )}
+                </div>
             </div>
         </nav>
     );

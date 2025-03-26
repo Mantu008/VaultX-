@@ -4,16 +4,29 @@ const uploadSchema = mongoose.Schema(
     {
         imgUrl: {
             type: String,
-            required: true,
+            required: false, // Image is optional
         },
         videoUrl: {
             type: String,
-            required: true,
+            required: false, // Video is optional
+        },
+        category: {
+            type: String,
+            required: true, // Category is required
+            enum: ["wedding", "birthday", "haldi", "other"], // Predefined categories (optional)
         },
     },
     {
         timestamps: true,
     }
 );
+
+// Ensure at least one of imgUrl or videoUrl is present
+uploadSchema.pre("save", function (next) {
+    if (!this.imgUrl && !this.videoUrl) {
+        return next(new Error("Either an image or a video is required."));
+    }
+    next();
+});
 
 export default mongoose.model("Upload", uploadSchema);

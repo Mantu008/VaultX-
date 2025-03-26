@@ -5,7 +5,12 @@
      { "src": "index.js", "use": "@vercel/node" }
    ],
    "routes": [
-     { "src": "/(.*)", "dest": "/index.js" }
-   ]
+     { "src": "/api/(.*)", "dest": "index.js" }
+   ],
+   "functions": {
+     "api/auth/login": {
+       "maxDuration": 10
+     }
+   }
  }
  

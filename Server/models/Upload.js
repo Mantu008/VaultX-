@@ -12,8 +12,7 @@ const uploadSchema = mongoose.Schema(
         },
         category: {
             type: String,
-            required: true, // Category is required
-            enum: ["wedding", "birthday", "haldi", "other"], // Predefined categories (optional)
+            required: true,
         },
     },
     {

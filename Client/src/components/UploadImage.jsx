@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 import { Circles } from "react-loader-spinner";
+import { useNavigate } from "react-router-dom";
+
 
 const UploadImage = () => {
     const [category, setCategory] = useState("");
@@ -9,6 +11,8 @@ const UploadImage = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const fileInputRef = useRef(null);
+    const navigate = useNavigate();
+
 
     const categories = [
         "Wedding", "Birthday", "Haldi", "Engagement", "Anniversary",
@@ -78,6 +82,7 @@ const UploadImage = () => {
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
+            navigate('/'); // Redirect to home page after upload
         } catch (error) {
             setError(error.message || "Upload failed. Please try again.");
             console.error("Upload Failed:", error);

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Circles } from "react-loader-spinner"; // Import loader
+import { useNavigate } from "react-router-dom";
 
 const Upload = () => {
     const [video, setVideo] = useState(null);
     const [img, setImg] = useState(null);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const uploadFile = async (type) => {
         const data = new FormData();
@@ -42,6 +44,7 @@ const Upload = () => {
             setVideo(null);
             setImg(null);
             alert('Upload successful!');
+            navigate('/'); // Redirect to home page after upload
         } catch (error) {
             console.log(error);
             alert('Upload failed!');

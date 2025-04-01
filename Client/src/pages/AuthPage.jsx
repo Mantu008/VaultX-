@@ -1,31 +1,41 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import API from "../api";
 import { useNavigate } from "react-router-dom";
+import { MediaContext } from "../context/MediaContext";
+import { toast } from "react-toastify"; // Import toast for notifications
 
 const AuthPage = () => {
     const [isRegister, setIsRegister] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [userName, setUserName] = useState(""); // Only for Register
+    const [loading, setLoading] = useState(false);
+    const { setIsAuthenticated } = useContext(MediaContext);
     const navigate = useNavigate();
 
     const handleAuth = async () => {
-        // http://localhost:5000/api/auth/
+        setLoading(true);
         try {
             const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
             const payload = isRegister ? { username: userName, email, password } : { email, password };
 
-
             const res = await API.post(endpoint, payload);
+
             if (!isRegister) {
                 localStorage.setItem("token", res.data.token);
+                setIsAuthenticated(true); // Update auth status globally
+                toast.success("Login successful!");
                 navigate("/");
             } else {
-                alert("Registration successful! Please log in.");
+                toast.success("Registration successful! Please log in.");
                 setIsRegister(false);
             }
         } catch (error) {
-            alert("Authentication failed");
+            const errorMessage =
+                error.response?.data?.message || "Authentication failed. Please try again.";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -62,9 +72,11 @@ const AuthPage = () => {
 
                 <button
                     onClick={handleAuth}
-                    className="bg-green-500 text-white px-4 py-2 rounded w-full"
+                    disabled={loading}
+                    className={`bg-green-500 text-white px-4 py-2 rounded w-full ${loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                 >
-                    {isRegister ? "Register" : "Login"}
+                    {loading ? "Processing..." : isRegister ? "Register" : "Login"}
                 </button>
 
                 <p className="text-center mt-4">

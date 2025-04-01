@@ -6,12 +6,14 @@ import Home from "./components/Home";
 // import SecureUpload from "./components/SecureUpload";
 import AuthPage from "./pages/AuthPage";
 import UploadPage from "./components/UploadPage";
+import { MediaProvider } from "./context/MediaContext";
 
 function App() {
   return (
-    <>
+    <MediaProvider>
       <Navbar />
       <Routes>
+
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/about" element={<About />} />
@@ -19,7 +21,7 @@ function App() {
         {/* <Route path="/upload" element={<Upload />} />
         <Route path="/secure-upload" element={<SecureUpload />} /> */}
       </Routes>
-    </>
+    </MediaProvider>
   );
 }
 

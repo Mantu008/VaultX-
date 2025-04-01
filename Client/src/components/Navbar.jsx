@@ -22,8 +22,10 @@ const Navbar = () => {
     // Logout function
     const handleLogout = () => {
         localStorage.removeItem("token");
-        navigate("/auth"); // Redirect to login page
+        navigate("/auth");
+        window.location.reload(); // Force component refresh
     };
+
 
     return (
         <nav className="bg-gray-900 p-4 shadow-lg">

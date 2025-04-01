@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { MediaContext } from "../context/MediaContext";
 import { HeartIcon, EyeIcon, DownloadIcon, XIcon } from "lucide-react";
 
-const ImageCard = ({ media, category, lowQualityMedia, isAuthenticated }) => {
+const ImageCard = ({ media, category, lowQualityMedia }) => {
+    const { isAuthenticated } = useContext(MediaContext);
     const [isModalOpen, setModalOpen] = useState(false);
     const isVideo = media.match(/\.(mp4|webm|ogg)$/i);
 
     return (
         <div className="relative border rounded-lg overflow-hidden shadow-lg group">
-            {/* Media Display */}
             {isVideo ? (
                 <video controls className="w-full h-40 object-cover" preload="metadata">
                     <source src={media} type="video/mp4" />
@@ -24,10 +25,8 @@ const ImageCard = ({ media, category, lowQualityMedia, isAuthenticated }) => {
                 />
             )}
 
-            {/* Category */}
             <h2 className="text-lg font-semibold mt-2 px-4">{category}</h2>
 
-            {/* Hover Actions */}
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                     className="bg-white text-black px-4 py-2 rounded-lg flex items-center gap-2 shadow-md hover:bg-gray-200"
@@ -37,7 +36,6 @@ const ImageCard = ({ media, category, lowQualityMedia, isAuthenticated }) => {
                 </button>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-between items-center px-4 py-3">
                 {isAuthenticated && <button className="text-red-500 hover:text-red-600">
                     <HeartIcon size={24} />
@@ -49,7 +47,6 @@ const ImageCard = ({ media, category, lowQualityMedia, isAuthenticated }) => {
                 )}
             </div>
 
-            {/* Modal for Viewing Large Image/Video */}
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
                     <div className="relative bg-white p-4 rounded-lg shadow-lg w-[90%] max-w-3xl flex flex-col items-center max-h-[90vh] overflow-hidden">

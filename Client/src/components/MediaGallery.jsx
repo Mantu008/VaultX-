@@ -1,19 +1,11 @@
-import ImageCard from "../components/ImageCard";
+import { useContext } from "react";
+import { MediaContext } from "../context/MediaContext";
+import ImageCard from "./ImageCard";
+import { Circles } from "react-loader-spinner";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Circles } from "react-loader-spinner"; // Import loader
 
-const MediaGallery = ({ media, isAuthenticated }) => {
-    // console.log("🔹 MediaGallery - isAuthenticated:", isAuthenticated);
-    // console.log("🔹 MediaGallery - media:", media);
-
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        // Simulate a slight delay for loading
-        const timer = setTimeout(() => setLoading(false), 500);
-        return () => clearTimeout(timer);
-    }, [media]);
+const MediaGallery = () => {
+    const { media, isAuthenticated, loading } = useContext(MediaContext);
 
     const handleDownload = async (url) => {
         try {
@@ -44,7 +36,7 @@ const MediaGallery = ({ media, isAuthenticated }) => {
                     {media.length > 0 ? (
                         media.map((item, index) => (
                             <div key={index} className="relative">
-                                <ImageCard media={item.imgUrl} category={item.category} isAuthenticated={isAuthenticated} />
+                                <ImageCard media={item.imgUrl} category={item.category} />
                                 {isAuthenticated && (
                                     <button
                                         onClick={() => handleDownload(item.imgUrl)}

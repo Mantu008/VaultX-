@@ -34,19 +34,29 @@ const MediaGallery = () => {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
                     {media.length > 0 ? (
-                        media.map((item, index) => (
-                            <div key={index} className="relative">
-                                <ImageCard media={item.imgUrl} category={item.category} />
-                                {isAuthenticated && (
-                                    <button
-                                        onClick={() => handleDownload(item.imgUrl)}
-                                        className="absolute bottom-2 right-2 bg-green-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Download
-                                    </button>
-                                )}
-                            </div>
-                        ))
+                        media.map((item, index) => {
+                            const src = item.imgUrl || item.videoUrl;
+                            if (!src) return null;
+                            return (
+                                <div key={item._id || index} className="relative">
+                                    <ImageCard
+                                        id={item._id}
+                                        media={src}
+                                        category={item.category}
+                                        initialLikes={item.likesCount || 0}
+                                        initialLiked={item.isLikedByCurrentUser || false}
+                                    />
+                                    {isAuthenticated && (
+                                        <button
+                                            onClick={() => handleDownload(src)}
+                                            className="absolute bottom-2 right-2 bg-green-500 text-white px-3 py-1 rounded"
+                                        >
+                                            Download
+                                        </button>
+                                    )}
+                                </div>
+                            );
+                        })
                     ) : (
                         <p className="text-gray-500">No media available</p>
                     )}

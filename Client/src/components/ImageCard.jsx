@@ -1,11 +1,45 @@
 import { useState, useContext } from "react";
+import axios from "axios";
 import { MediaContext } from "../context/MediaContext";
 import { HeartIcon, EyeIcon, DownloadIcon, XIcon } from "lucide-react";
 
-const ImageCard = ({ media, category, lowQualityMedia }) => {
+const ImageCard = ({ id, media, category, lowQualityMedia, initialLikes = 0, initialLiked = false }) => {
     const { isAuthenticated } = useContext(MediaContext);
     const [isModalOpen, setModalOpen] = useState(false);
+    const [likes, setLikes] = useState(initialLikes);
+    const [isLiked, setIsLiked] = useState(initialLiked);
+    const [liking, setLiking] = useState(false);
+
     const isVideo = media.match(/\.(mp4|webm|ogg)$/i);
+
+    const handleLike = async () => {
+        if (!isAuthenticated || liking || !id) return;
+        setLiking(true);
+        try {
+            const token = localStorage.getItem("token");
+            const res = await axios.post(
+                `${import.meta.env.VITE_REACT_BACKEND_APP_API_URL}/api/upload/${id}/like`,
+                {},
+                token
+                    ? { headers: { Authorization: `Bearer ${token}` } }
+                    : undefined
+            );
+            setLikes(
+                typeof res.data.likesCount === "number"
+                    ? res.data.likesCount
+                    : likes + (isLiked ? -1 : 1)
+            );
+            if (typeof res.data.liked === "boolean") {
+                setIsLiked(res.data.liked);
+            } else {
+                setIsLiked(!isLiked);
+            }
+        } catch (error) {
+            console.error("Failed to like media:", error);
+        } finally {
+            setLiking(false);
+        }
+    };
 
     return (
         <div className="relative border rounded-lg overflow-hidden shadow-lg group">
@@ -27,9 +61,9 @@ const ImageCard = ({ media, category, lowQualityMedia }) => {
 
             <h2 className="text-lg font-semibold mt-2 px-4">{category}</h2>
 
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 <button
-                    className="bg-white text-black px-4 py-2 rounded-lg flex items-center gap-2 shadow-md hover:bg-gray-200"
+                    className="bg-white text-black px-4 py-2 rounded-lg flex items-center gap-2 shadow-md hover:bg-gray-200 pointer-events-auto"
                     onClick={() => setModalOpen(true)}
                 >
                     <EyeIcon size={18} /> View Large
@@ -37,9 +71,19 @@ const ImageCard = ({ media, category, lowQualityMedia }) => {
             </div>
 
             <div className="flex justify-between items-center px-4 py-3">
-                {isAuthenticated && <button className="text-red-500 hover:text-red-600">
-                    <HeartIcon size={24} />
-                </button>}
+                {isAuthenticated && (
+                    <button
+                        onClick={handleLike}
+                        disabled={liking || !id}
+                        className={`flex items-center gap-1 text-red-500 hover:text-red-600 disabled:opacity-50`}
+                    >
+                        <HeartIcon
+                            size={24}
+                            className={isLiked ? "fill-red-500 text-red-500" : ""}
+                        />
+                        <span className="text-sm text-gray-700">{likes}</span>
+                    </button>
+                )}
                 {isAuthenticated && (
                     <a href={media} download className="text-gray-700 hover:text-gray-900">
                         <DownloadIcon size={24} />

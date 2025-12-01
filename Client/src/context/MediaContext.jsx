@@ -47,8 +47,21 @@ export const MediaProvider = ({ children }) => {
 
     const fetchMedia = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_BACKEND_APP_API_URL}/api/upload`);
-            setMedia(res.data);
+            const token = localStorage.getItem("token");
+            const res = await axios.get(
+                `${import.meta.env.VITE_REACT_BACKEND_APP_API_URL}/api/upload`,
+                token
+                    ? { headers: { Authorization: `Bearer ${token}` } }
+                    : undefined
+            );
+            // Backend returns { data: [...], pagination: {...} }
+            const response = res.data;
+            const list = Array.isArray(response)
+                ? response
+                : Array.isArray(response.data)
+                    ? response.data
+                    : [];
+            setMedia(list);
         } catch (error) {
             console.error("Error fetching media:", error);
         } finally {

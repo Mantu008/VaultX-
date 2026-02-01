@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import API from "../api";
 import { useNavigate } from "react-router-dom";
 import { MediaContext } from "../context/MediaContext";
-import { toast } from "react-toastify"; // Import toast for notifications
+import { toast } from "react-toastify";    // Import toast for notifications
 
 const AuthPage = () => {
     const [isRegister, setIsRegister] = useState(false);
